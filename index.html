@@ -127,26 +127,18 @@ function openSettingsModal() {
         if (text.includes('开始时间')) {
             const parts = text.split('开始时间：')[1];
             if (parts) {
-                const datePart = parts.match(/(\d{4})年(\d{2})月(\d{2})日/);
-                if (datePart) {
-                    startDate = `${datePart[1]}-${datePart[2]}-${datePart[3]}`;
-                } else {
-                    startDate = parts.split(/\s+/)[0];
-                }
+                const datePart = parts.split(/\s+/)[0];
                 const timePart = parts.match(/\d{2}:\d{2}/)?.[0];
+                startDate = datePart;
                 startTime = timePart || '';
             }
         }
         if (text.includes('结束时间')) {
             const parts = text.split('结束时间：')[1];
             if (parts) {
-                const datePart = parts.match(/(\d{4})年(\d{2})月(\d{2})日/);
-                if (datePart) {
-                    endDate = `${datePart[1]}-${datePart[2]}-${datePart[3]}`;
-                } else {
-                    endDate = parts.split(/\s+/)[0];
-                }
+                const datePart = parts.split(/\s+/)[0];
                 const timePart = parts.match(/\d{2}:\d{2}/)?.[0];
+                endDate = datePart;
                 endTime = timePart || '';
             }
         }
@@ -199,12 +191,9 @@ function saveSettings() {
     const paragraphs = contentR.querySelectorAll('p');
     const vueAttr = 'data-v-5d961564'; // 保存这个关键属性
 
-    const displayStartDate = startDate.replace(/-/g, '年', 1).replace(/-/g, '月', 1) + '日';
-    const displayEndDate = endDate.replace(/-/g, '年', 1).replace(/-/g, '月', 1) + '日';
-
     paragraphs[0].innerHTML = '场地：' + venue;
-    paragraphs[1].innerHTML = '开始时间：' + displayStartDate + '\n <i ' + vueAttr + '>' + startTime + '</i>';
-    paragraphs[2].innerHTML = '结束时间：' + displayEndDate + '\n <i ' + vueAttr + '>' + endTime + '</i>';
+    paragraphs[1].innerHTML = '开始时间：' + startDate + '\n <i ' + vueAttr + '>' + startTime + '</i>';
+    paragraphs[2].innerHTML = '结束时间：' + endDate + '\n <i ' + vueAttr + '>' + endTime + '</i>';
     
     // 更新二维码框中的场地名称
     const qrcodeNameDiv = document.querySelector('[data-v-5d961564]').querySelector('.qrcodeBox .name');
