@@ -911,7 +911,7 @@
             />
           </li>
         </ul>
-        <div data-v-5d961564="" class="codeBox qrcodeActive" style="">
+        <div data-v-5d961564="" class="codeBox">
           <div data-v-5d961564="" class="qrcodeBox">
             <div data-v-5d961564="" class="name">羽毛球4</div>
             <div
@@ -1023,7 +1023,7 @@
             "
           ></div
         ></span>
-        <span class="mint-indicator-text" style="">加载中...</span>
+        <span class="mint-indicator-text">加载中...</span>
       </div>
       <div class="mint-indicator-mask"></div>
     </div>
@@ -1174,6 +1174,52 @@
             "
           />
         </div>
+        <div style="margin-bottom: 15px">
+          <label
+            style="
+              display: block;
+              color: #666;
+              font-size: 14px;
+              margin-bottom: 5px;
+            "
+            >同行人姓名</label
+          ><input
+            type="text"
+            id="companionNameInput"
+            placeholder="输入同行人姓名"
+            style="
+              width: 100%;
+              padding: 8px;
+              border: 1px solid #ddd;
+              border-radius: 4px;
+              box-sizing: border-box;
+              font-size: 14px;
+            "
+          />
+        </div>
+        <div style="margin-bottom: 20px">
+          <label
+            style="
+              display: block;
+              color: #666;
+              font-size: 14px;
+              margin-bottom: 5px;
+            "
+            >同行人学工号</label
+          ><input
+            type="text"
+            id="companionStudentIdInput"
+            placeholder="输入同行人学工号"
+            style="
+              width: 100%;
+              padding: 8px;
+              border: 1px solid #ddd;
+              border-radius: 4px;
+              box-sizing: border-box;
+              font-size: 14px;
+            "
+          />
+        </div>
         <div style="display: flex; gap: 10px">
           <button
             id="confirmBtn"
@@ -1208,9 +1254,119 @@
         </div>
       </div>
     </div>
+    <div id="myTongxinren" style="display: none; z-index: 1001">
+      <div class="main">
+        <div class="li-box">
+          <div class="left">
+            <span>张三<i>(学工号:12345678)</i></span>
+          </div>
+          <span class="delimg" aria-label="删除同行人" title="删除同行人">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M9 3h6l1 2h4v2H4V5h4l1-2zm1 6h2v8h-2V9zm4 0h2v8h-2V9zM7 9h2v8H7V9zm1 11h8a2 2 0 0 0 2-2V8H6v10a2 2 0 0 0 2 2z"
+              ></path>
+            </svg>
+          </span>
+        </div>
+        <div class="btn_box">
+          <button id="companionCloseBtn">添加同行人</button>
+        </div>
+      </div>
+    </div>
+    <style>
+      #myTongxinren {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #fff;
+      }
+
+      #myTongxinren .main {
+        padding: 0.3rem;
+        box-sizing: border-box;
+      }
+
+      #myTongxinren .btn_box {
+        width: 100%;
+        margin-top: 0.1rem;
+      }
+
+      #myTongxinren .btn_box p {
+        text-align: center;
+        color: #666;
+        font-size: 12px;
+      }
+
+      #myTongxinren button {
+        outline: none;
+        border: 0;
+        width: 5.9rem;
+        font-size: 15px;
+        padding: 0.25rem 0;
+        color: #fff;
+        margin: 0 auto;
+        background-color: #7ecef4;
+        border-radius: 8px;
+        display: flex;
+        text-align: center;
+        justify-content: center;
+        position: absolute;
+        bottom: 0.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+      }
+
+      #myTongxinren .li-box {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.4rem 0;
+        border-bottom: 1px solid #e1ddd7;
+      }
+
+      #myTongxinren .left {
+        display: flex;
+        align-items: center;
+      }
+
+      #myTongxinren .left span {
+        color: #333;
+        font-size: 16px;
+      }
+
+      #myTongxinren .left i {
+        font-style: normal;
+        font-size: 14px;
+        color: #666;
+        margin-left: 0.08rem;
+      }
+
+      #myTongxinren .delimg {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 18px;
+        height: 18px;
+        color: #b8b8b8;
+      }
+
+      #myTongxinren .delimg svg {
+        width: 18px;
+        height: 18px;
+        fill: currentColor;
+      }
+    </style>
     <script>
       // 使用事件委托来处理动态加载的元素
       document.addEventListener("click", function (event) {
+        if (isCompanionButton(event.target)) {
+          event.preventDefault();
+          openCompanionPage(event.target);
+          return;
+        }
+
         // 检查是否点击了设置按钮
         if (event.target && event.target.id === "settingsBtn") {
           openSettingsModal();
@@ -1226,10 +1382,15 @@
           closeSettingsModal();
         }
 
+        if (event.target && event.target.id === "companionCloseBtn") {
+          closeCompanionPage();
+        }
+
         // 检查是否点击了二维码关闭按钮
         if (event.target && event.target.matches(".codeBox .close")) {
           const codeBox = document.querySelector(".codeBox");
           if (codeBox) {
+            codeBox.classList.remove("qrcodeActive");
             codeBox.style.display = "none";
           }
         }
@@ -1238,10 +1399,76 @@
         if (event.target && event.target.matches(".qrcodeIcon")) {
           const codeBox = document.querySelector(".codeBox");
           if (codeBox) {
+            codeBox.classList.add("qrcodeActive");
             codeBox.style.display = "";
           }
         }
       });
+
+      function isCompanionButton(target) {
+        return (
+          !!target &&
+          target.matches("#myOrderSite .content_r > button:not(#settingsBtn)") &&
+          target.textContent.trim() === "同行人"
+        );
+      }
+
+      function getMyOrderSiteVueInstance() {
+        const myOrderSite = document.getElementById("myOrderSite");
+        return myOrderSite ? myOrderSite.__vue__ : null;
+      }
+
+      function getListItemIndex(button) {
+        const item = button.closest("li");
+        const list = Array.from(
+          document.querySelectorAll("#myOrderSite ul.content > li"),
+        );
+        return list.indexOf(item);
+      }
+
+      function getBillNumFromHash() {
+        const hash = window.location.hash || "";
+        const queryString = hash.includes("?") ? hash.split("?")[1] : "";
+        const params = new URLSearchParams(queryString);
+        return params.get("billNum");
+      }
+
+      function showCompanionPage() {
+        const companionPage = document.getElementById("myTongxinren");
+        if (companionPage) {
+          companionPage.style.display = "block";
+        }
+      }
+
+      function closeCompanionPage() {
+        const companionPage = document.getElementById("myTongxinren");
+        if (companionPage) {
+          companionPage.style.display = "none";
+        }
+      }
+
+      function openCompanionPage(button) {
+        getListItemIndex(button);
+        getBillNumFromHash();
+        getMyOrderSiteVueInstance();
+        showCompanionPage();
+      }
+
+      function hideInitialQrcodeOverlay() {
+        const codeBox = document.querySelector("#myOrderSite .codeBox");
+        if (!codeBox) {
+          return;
+        }
+
+        codeBox.classList.remove("qrcodeActive");
+        codeBox.style.display = "none";
+      }
+
+      if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", hideInitialQrcodeOverlay);
+      } else {
+        hideInitialQrcodeOverlay();
+      }
 
       // 点击对话框外部关闭
       const settingsModal = document.getElementById("settingsModal");
@@ -1260,6 +1487,10 @@
         const startTimeInput = document.getElementById("startTimeInput");
         const endDateInput = document.getElementById("endDateInput");
         const endTimeInput = document.getElementById("endTimeInput");
+        const companionNameInput = document.getElementById("companionNameInput");
+        const companionStudentIdInput = document.getElementById(
+          "companionStudentIdInput",
+        );
         const settingsModal = document.getElementById("settingsModal");
 
         // 读取当前值
@@ -1272,10 +1503,14 @@
           .querySelector("[data-v-5d961564]")
           .querySelector(".content_r")
           .querySelectorAll("p");
+        const companionSpan = document.querySelector("#myTongxinren .left span");
+        const companionTag = document.querySelector("#myTongxinren .left i");
         let startDate = "",
           startTime = "",
           endDate = "",
           endTime = "";
+        let companionName = "";
+        let companionStudentId = "";
 
         timeLines.forEach((line) => {
           const text = line.textContent;
@@ -1305,6 +1540,19 @@
         startTimeInput.value = startTime;
         endDateInput.value = endDate;
         endTimeInput.value = endTime;
+        if (companionSpan) {
+          companionName = companionSpan.childNodes[0]
+            ? companionSpan.childNodes[0].textContent.trim()
+            : companionSpan.textContent.replace(/\(学工号:.*\)$/, "").trim();
+        }
+        if (companionTag) {
+          companionStudentId = companionTag.textContent
+            .replace(/^\(学工号:/, "")
+            .replace(/\)$/, "")
+            .trim();
+        }
+        companionNameInput.value = companionName;
+        companionStudentIdInput.value = companionStudentId;
 
         // 显示模态框
         if (settingsModal) {
@@ -1327,6 +1575,10 @@
         const startTimeInput = document.getElementById("startTimeInput");
         const endDateInput = document.getElementById("endDateInput");
         const endTimeInput = document.getElementById("endTimeInput");
+        const companionNameInput = document.getElementById("companionNameInput");
+        const companionStudentIdInput = document.getElementById(
+          "companionStudentIdInput",
+        );
         const settingsBtn = document.getElementById("settingsBtn");
 
         const venue = venueInput.value.trim();
@@ -1334,9 +1586,19 @@
         const startTime = startTimeInput.value;
         const endDate = endDateInput.value;
         const endTime = endTimeInput.value;
+        const companionName = companionNameInput.value.trim();
+        const companionStudentId = companionStudentIdInput.value.trim();
 
         // 校验输入
-        if (!venue || !startDate || !startTime || !endDate || !endTime) {
+        if (
+          !venue ||
+          !startDate ||
+          !startTime ||
+          !endDate ||
+          !endTime ||
+          !companionName ||
+          !companionStudentId
+        ) {
           alert("请填写所有字段");
           return;
         }
@@ -1366,6 +1628,13 @@
           .querySelector(".qrcodeBox .name");
         if (qrcodeNameDiv) {
           qrcodeNameDiv.textContent = venue;
+        }
+
+        const companionSpan = document.querySelector("#myTongxinren .left span");
+        const companionTag = document.querySelector("#myTongxinren .left i");
+        if (companionSpan && companionTag) {
+          companionSpan.childNodes[0].textContent = companionName;
+          companionTag.textContent = "(学工号:" + companionStudentId + ")";
         }
 
         // 隐藏设置按钮
