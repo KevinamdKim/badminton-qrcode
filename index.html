@@ -209,4 +209,58 @@ function saveSettings() {
     // 关闭对话框
     closeSettingsModal();
 }
+// 自动将显示日期设置为 UTC+8 当天，避免页面异步渲染后被覆盖
+function getUTC8TodayString() {
+    const now = new Date();
+    const utcMillis = now.getTime() + now.getTimezoneOffset() * 60000;
+    const utc8Date = new Date(utcMillis + 8 * 60 * 60000);
+    const year = utc8Date.getUTCFullYear();
+    const month = String(utc8Date.getUTCMonth() + 1).padStart(2, '0');
+    const day = String(utc8Date.getUTCDate()).padStart(2, '0');
+    return year + '-' + month + '-' + day;
+}
+
+function applyUTC8TodayToPage() {
+    const contentR = document.querySelector('#myOrderSite .content_r');
+    if (!contentR) return false;
+
+    const paragraphs = contentR.querySelectorAll('p');
+    if (!paragraphs || paragraphs.length < 3) return false;
+
+    const startLine = paragraphs[1];
+    const endLine = paragraphs[2];
+    if (!startLine || !endLine) return false;
+
+    const today = getUTC8TodayString();
+    const startTimeNode = startLine.querySelector('i');
+    const endTimeNode = endLine.querySelector('i');
+    const startTime = startTimeNode ? startTimeNode.textContent.trim() : '';
+    const endTime = endTimeNode ? endTimeNode.textContent.trim() : '';
+
+    startLine.innerHTML = '开始时间：' + today + '\n <i data-v-5d961564="">' + startTime + '</i>';
+    endLine.innerHTML = '结束时间：' + today + '\n <i data-v-5d961564="">' + endTime + '</i>';
+    return true;
+}
+
+function ensureUTC8DateApplied() {
+    applyUTC8TodayToPage();
+
+    // Vue 首屏和异步数据可能会在几秒内反复改写 DOM，这里做有限时重试
+    let tries = 0;
+    const maxTries = 40;
+    const timer = setInterval(function () {
+        tries += 1;
+        applyUTC8TodayToPage();
+        if (tries >= maxTries) {
+            clearInterval(timer);
+        }
+    }, 500);
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', ensureUTC8DateApplied);
+} else {
+    ensureUTC8DateApplied();
+}
 </script>
+
